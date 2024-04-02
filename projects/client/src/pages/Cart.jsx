@@ -5,6 +5,8 @@ import {
   Divider,
   Text,
   useToast,
+  Grid,
+  GridItem
 } from '@chakra-ui/react';
 import CartItems from '../components/CartItems';
 import { axiosInstance } from '../api';
@@ -48,7 +50,7 @@ const Cart = () => {
         <CartItems
           id={val.id}
           ProductId={val.Product.id}
-          image_url={val.Product.Image_Urls[0].image_url}
+          image_url={val.Product.Image_Urls[0]?.image_url}
           price={val.Product.price}
           product_name={val.Product.product_name}
           quantity={val.quantity}
@@ -92,24 +94,27 @@ const Cart = () => {
   }, []);
   return (
     <Box
-      p='19px 0 0 '
-      mx='auto'
-      mt='80px'
+      alignItems={'center'}
+      mt='60px'
       h={cart.length === 0 ? '' : '100vh'}
     >
       <Helmet>
         <meta charSet='utf-8' />
         <title>Keranjang | OusamaBike</title>
       </Helmet>
-      <Box
-        display={'flex'}
+      <Grid
+        maxWidth={"1200px"}
+        margin={"auto"}
+        templateColumns={!cart.length ? "1fr" : "3.8fr 1.7fr"}
+        gap={!cart.length ? 0 : 1}
         p='0 20px'
         pt='40px'
+        mx={'auto'}
         fontSize='20px'
         fontWeight={'bold'}
       >
         {/* Cart */}
-        {cart.length === 0 ? (
+        {!cart.length ? (
           <Box
             h='272px'
             display='flex'
@@ -140,10 +145,10 @@ const Cart = () => {
             </Box>
           </Box>
         ) : (
-          <>
-            <Box mr='45px'>
+            <>
+            <GridItem mr='45px'>
               <Box>Keranjang</Box>
-              <Box w='677px'>
+              <Box>
                 <Box
                   p='16px 0'
                   display={'flex'}
@@ -171,9 +176,9 @@ const Cart = () => {
                 {/* Cart Items */}
                 {renderCart()}
               </Box>
-            </Box>
+            </GridItem>
             {/* Total Price */}
-            <Box>
+            <GridItem>
               <Box
                 w={'350px'}
                 top='140px'
@@ -213,15 +218,16 @@ const Cart = () => {
                   color={'white'}
                   bgColor={heroColor}
                   _hover={false}
-                  onClick={() => navigate('/checkout')}
+                  disabled={totalQuantityChecked > 0 ? false : true}
+                  onClick={() => navigate('/checkout', { state: { parameter: cart } })}
                 >
                   Beli
                 </Button>
               </Box>
-            </Box>
+            </GridItem>
           </>
         )}
-      </Box>
+      </Grid>
     </Box>
   );
 };

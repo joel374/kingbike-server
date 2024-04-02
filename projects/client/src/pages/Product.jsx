@@ -13,6 +13,7 @@ import { BsChatLeftText } from 'react-icons/bs';
 import { axiosInstance } from '../api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setTotalCart } from '../redux/features/cartSlice';
+import { setTotalWishlist } from '../redux/features/wishlistSlice';
 
 const Product = () => {
   const [product, setProduct] = useState({});
@@ -23,6 +24,7 @@ const Product = () => {
   const toast = useToast();
   const dispatch = useDispatch();
   const cartSelector = useSelector((state) => state.cart);
+  const wishlistSelector = useSelector((state) => state.wishlist);
 
   const addToCart = async (id) => {
     try {
@@ -54,7 +56,7 @@ const Product = () => {
     fetchProduct(params.id).then((res) =>
       doubleOnclick(setProduct(res), setImage(res.Image_Urls[0].image_url))
     );
-  });
+  }, []);
   return (
     <Box p='19px 0 0 ' mx='auto' w='1188px' mt='80px'>
       <Box mb='19px'>
@@ -201,7 +203,8 @@ const Product = () => {
                   _active={false}
                   bgColor={'transparent'}
                   onClick={() =>
-                    addToWishlistHandler(params.id).then((res) =>
+                    addToWishlistHandler(params.id).then((res) =>{
+                    dispatch(setTotalWishlist(wishlistSelector.totalWishlist + 1))
                       res.error
                         ? toast({
                           title: 'Produk gagal ditambahkan ke wishlist',
@@ -209,12 +212,13 @@ const Product = () => {
                           status: 'error',
                           variant: 'top-accent',
                         })
+
                         : toast({
                           title: 'Produk ditambahkan ke wishlist',
                           description: res,
                           status: 'success',
                           variant: 'top-accent',
-                        })
+                        })}
                     )
                   }
                   p='0 12px'

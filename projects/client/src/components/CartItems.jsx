@@ -35,6 +35,14 @@ const CartItems = ({
             onChange={() => checkBtnHandler(id)}
           ></Checkbox>
           <Image
+            onClick={() =>
+              navigate(
+                `/product/${product_name
+                  .replace(/\s+/g, "-")
+                  .toLowerCase()}/${ProductId}`
+              )
+            }
+            cursor={'pointer'}
             h="69px"
             w="69px"
             objectFit={"cover"}
@@ -42,6 +50,7 @@ const CartItems = ({
           />
           <Box pl="12px">
             <Text
+              cursor={'pointer'}
               fontWeight={"normal"}
               onClick={() =>
                 navigate(
