@@ -135,6 +135,34 @@ const transactionController = {
       return res.status(500).json({ message: "Server Error" });
     }
   },
+  getAllTransactions: async (req, res) => {
+    try {
+      const { _page = 1, _limit = 20, status } = req.query;
+      const where = {};
+      if (status) where.status = status;
+
+      const { count, rows } = await db.Transaction.findAndCountAll({
+        where,
+        include: [
+          { model: db.TransactionItem, include: [{ model: db.Product }] },
+          { model: db.Address },
+          { model: db.User, attributes: ["id", "username", "email"] },
+        ],
+        order: [["createdAt", "DESC"]],
+        limit: Number(_limit),
+        offset: (Number(_page) - 1) * Number(_limit),
+      });
+
+      return res.status(200).json({
+        message: "Get all transactions successfully",
+        data: rows,
+        dataCount: count,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Server Error" });
+    }
+  },
   // Handle Midtrans notification (webhook)
   notification: async (req, res) => {
     try {
