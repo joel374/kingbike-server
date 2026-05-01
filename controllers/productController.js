@@ -227,9 +227,25 @@ const productController = {
       let successCount = 0;
       let failCount = 0;
 
+      const categories = await db.Category.findAll();
+      const brands = await db.Brand_Category.findAll();
+      const categoriList = categories.map(category => category.id);
+      const brandList = brands.map(brand => brand.id);      
+ 
+
       for (const row of data) {
         try {
           if (!row.product_name) {
+            failCount++;
+            continue;
+          }
+
+          if(!categoriList.includes(row.CategoryId)) {
+            failCount++;
+            continue;
+          }
+
+          if(!brandList.includes(row.BrandCategoryId)) {
             failCount++;
             continue;
           }
@@ -289,6 +305,31 @@ const productController = {
         ["Contoh Sepeda BMX", 10, 1, 1, 1500000, "Sepeda BMX keren", "BMX-001", 1000, 10, 10, 10, true]
       ];
       const wsProduct = xlsx.utils.aoa_to_sheet(wsProductData);
+      wsProduct['!cols'] = [{
+        wch: 20
+      }, {
+        wch: 10
+      }, {
+        wch: 10
+      }, {
+        wch: 10
+      }, {
+        wch: 10
+      }, {
+        wch: 10
+      }, {
+        wch: 10
+      }, {
+        wch: 10
+      }, {
+        wch: 10
+      }, {
+        wch: 10
+      }, {
+        wch: 10
+      }, {
+        wch: 10
+      }]
       xlsx.utils.book_append_sheet(wb, wsProduct, "Products");
 
       // 2. Category Reference Sheet
@@ -296,14 +337,24 @@ const productController = {
       const wsCategoryData = [["CategoryId", "Category Name"]];
       categories.forEach(c => wsCategoryData.push([c.id, c.category_name]));
       const wsCategory = xlsx.utils.aoa_to_sheet(wsCategoryData);
-      xlsx.utils.book_append_sheet(wb, wsCategory, "Reference_Categories");
+      wsCategory["!cols"] = [{
+        wch: 10
+      }, {
+        wch: 20
+      }]
+      xlsx.utils.book_append_sheet(wb, wsCategory, "Reference Categories");
 
       // 3. Brand Reference Sheet
       const brands = await db.Brand_Category.findAll();
       const wsBrandData = [["BrandCategoryId", "Brand Name"]];
       brands.forEach(b => wsBrandData.push([b.id, b.brand_name]));
       const wsBrand = xlsx.utils.aoa_to_sheet(wsBrandData);
-      xlsx.utils.book_append_sheet(wb, wsBrand, "Reference_Brands");
+      wsBrand["!cols"] = [{
+        wch: 20
+      }, {
+        wch: 20
+      }]
+      xlsx.utils.book_append_sheet(wb, wsBrand, "Reference Brands");
 
       const buffer = xlsx.write(wb, { type: "buffer", bookType: "xlsx" });
       res.setHeader("Content-Disposition", 'attachment; filename="Product_Template.xlsx"');

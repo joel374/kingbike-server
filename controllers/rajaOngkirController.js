@@ -1,4 +1,5 @@
-const axios = require('axios');
+const axios = require("axios");
+const { Province, City } = require("../models");
 
 const RAJAONGKIR_API_KEY = process.env.RAJAONGKIR_API_KEY;
 const RAJAONGKIR_BASE_URL_DESTINATION = process.env.RAJAONGKIR_BASE_URL_DESTINATION;
@@ -7,43 +8,23 @@ const RAJAONGKIR_BASE_URL_COST = process.env.RAJAONGKIR_BASE_URL_COST;
 const rajaOngkirController = {
   getProvinces: async (req, res) => {
     try {
-      const response = await axios.get(
-        `${RAJAONGKIR_BASE_URL_DESTINATION}/province`,
-        {
-          headers: { key: RAJAONGKIR_API_KEY },
-        },
-      );
-      const data = response.data.data || response.data;
-      const mapped = data.map(p => ({
-        province_id: p.id.toString(),
-        province: p.name,
-      }));
-      return res.status(200).json(mapped);
+      const provinces = await Province.findAll();
+      return res.status(200).json(provinces);
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ message: 'Server Error' });
+      return res.status(500).json({ message: "Server Error" });
     }
   },
   getCities: async (req, res) => {
     try {
       const { provinceId } = req.query;
-      const response = await axios.get(
-        `${RAJAONGKIR_BASE_URL_DESTINATION}/city/${provinceId}`,
-        {
-          headers: { key: RAJAONGKIR_API_KEY },
-        },
-      );
-      const data = response.data.data || response.data;
-      const mapped = data.map(c => ({
-        city_id: c.id.toString(),
-        province_id: provinceId,
-        city_name: c.name,
-        type: '', // Komerce doesn't seem to provide type (Kota/Kabupaten) in this endpoint
-      }));
-      return res.status(200).json(mapped);
+      const cities = await City.findAll({
+        where: { province_id: provinceId },
+      });
+      return res.status(200).json(cities);
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ message: 'Server Error' });
+      return res.status(500).json({ message: "Server Error" });
     }
   },
   getCost: async (req, res) => {

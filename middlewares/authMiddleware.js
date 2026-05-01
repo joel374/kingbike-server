@@ -1,6 +1,7 @@
 const { validateToken } = require("../lib/jwt")
+const db = require("../models");
 
-const verifyToken = (req, res, next) => {
+const verifyToken = async (req, res, next) => {
   let token = req.headers.authorization
 
   if (!token) {
@@ -20,16 +21,22 @@ const verifyToken = (req, res, next) => {
       })
     }
 
-    req.user = verifiedUser
+    const is_admin = await db.User.findOne({
+      where: {
+        id: verifiedUser.id,
+      },
+    });
 
-    next()
+    req.user = { ...verifiedUser, is_admin: is_admin.is_admin };
+
+    next();
   } catch (err) {
     console.log(err)
   }
 }
 
 const checkAdmin = (req, res, next) => {
-  if (req.user.role_id !== 1) {
+  if (!req.user.is_admin) {
     return res.status(403).json({
       message: "Admin only request",
     })

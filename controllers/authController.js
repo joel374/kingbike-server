@@ -55,7 +55,6 @@ const authController = {
       });
 
       const verificationLink = ` ${process.env.BASE_URL_FE}/verification?verification_token=${verificationToken}`;
-console.log(verificationLink);
 
       const rawHTML = fs.readFileSync("templates/verification.html", "utf-8");
 
