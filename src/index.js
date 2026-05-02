@@ -51,14 +51,15 @@ app.use("/greetings", (req, res) => {
   }
 });
 
-app.listen(PORT, (err) => {
-  if (err) {
-    console.log(`ERROR: ${err}`);
-  } else {
-    db.sequelize.sync({ alter: true });
-    if (!fs.existsSync("public")) {
-      fs.mkdirSync("public");
-    }
-    console.log(`APP RUNNING at ${PORT}`);
+(async () => {
+  try {
+    await db.sequelize.sync({ alter: true });
+
+    app.listen(PORT, () => {
+      console.log("APP RUNNING at", PORT);
+    });
+
+  } catch (err) {
+    console.log("FAILED TO START:", err);
   }
-});
+})();
